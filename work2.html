@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Stopwatch App</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f4f4;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+
+    .container {
+      background: #fff;
+      padding: 30px;
+      border-radius: 15px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+      text-align: center;
+      width: 300px;
+    }
+
+    h1 {
+      margin-bottom: 20px;
+      font-size: 1.8rem;
+      color: #333;
+    }
+
+    .time-display {
+      font-size: 2rem;
+      font-weight: bold;
+      margin-bottom: 20px;
+      color: #444;
+    }
+
+    .buttons {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    button {
+      padding: 10px 15px;
+      border: none;
+      border-radius: 8px;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+
+    button.start { background: #4CAF50; color: white; }
+    button.start:hover { background: #45a049; }
+
+    button.pause { background: #ff9800; color: white; }
+    button.pause:hover { background: #e68a00; }
+
+    button.reset { background: #f44336; color: white; }
+    button.reset:hover { background: #da190b; }
+
+    button.lap { background: #2196F3; color: white; }
+    button.lap:hover { background: #1976D2; }
+
+    .laps {
+      max-height: 150px;
+      overflow-y: auto;
+      text-align: left;
+      font-size: 0.9rem;
+    }
+
+    .lap-time {
+      padding: 5px 0;
+      border-bottom: 1px solid #ddd;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <h1>Stopwatch</h1>
+    <div class="time-display" id="display">00:00:00</div>
+
+    <div class="buttons">
+      <button class="start" id="startBtn">Start</button>
+      <button class="pause" id="pauseBtn">Pause</button>
+      <button class="reset" id="resetBtn">Reset</button>
+      <button class="lap" id="lapBtn">Lap</button>
+    </div>
+
+    <div class="laps" id="laps"></div>
+  </div>
+
+  <script>
+    let timer;
+    let isRunning = false;
+    let startTime;
+    let elapsedTime = 0;
+
+    const display = document.getElementById("display");
+    const startBtn = document.getElementById("startBtn");
+    const pauseBtn = document.getElementById("pauseBtn");
+    const resetBtn = document.getElementById("resetBtn");
+    const lapBtn = document.getElementById("lapBtn");
+    const laps = document.getElementById("laps");
+
+    function formatTime(ms) {
+      const totalSeconds = Math.floor(ms / 1000);
+      const hours = String(Math.floor(totalSeconds / 3600)).padStart(2, "0");
+      const minutes = String(Math.floor((totalSeconds % 3600) / 60)).padStart(2, "0");
+      const seconds = String(totalSeconds % 60).padStart(2, "0");
+      return `${hours}:${minutes}:${seconds}`;
+    }
+
+    function updateTime() {
+      const currentTime = Date.now();
+      const diff = currentTime - startTime + elapsedTime;
+      display.textContent = formatTime(diff);
+    }
+
+    startBtn.addEventListener("click", () => {
+      if (!isRunning) {
+        isRunning = true;
+        startTime = Date.now();
+        timer = setInterval(updateTime, 1000);
+      }
+    });
+
+    pauseBtn.addEventListener("click", () => {
+      if (isRunning) {
+        isRunning = false;
+        elapsedTime += Date.now() - startTime;
+        clearInterval(timer);
+      }
+    });
+
+    resetBtn.addEventListener("click", () => {
+      isRunning = false;
+      clearInterval(timer);
+      elapsedTime = 0;
+      display.textContent = "00:00:00";
+      laps.innerHTML = "";
+    });
+
+    lapBtn.addEventListener("click", () => {
+      if (isRunning) {
+        const lapTime = display.textContent;
+        const lapItem = document.createElement("div");
+        lapItem.className = "lap-time";
+        lapItem.textContent = `Lap: ${lapTime}`;
+        laps.appendChild(lapItem);
+      }
+    });
+  </script>
+
+</body>
+</html>
